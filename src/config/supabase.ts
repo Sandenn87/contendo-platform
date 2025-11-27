@@ -45,18 +45,23 @@ export function getSupabaseAdmin(): SupabaseClient {
   return supabaseAdminInstance;
 }
 
-// For backward compatibility - will throw error if env vars not set
-export const supabaseClient = new Proxy({} as SupabaseClient, {
-  get(_target, prop) {
-    return getSupabaseClient()[prop as keyof SupabaseClient];
-  }
-});
+// For backward compatibility - lazy getters
+export const supabaseClient = {
+  get auth() { return getSupabaseClient().auth; },
+  get from() { return getSupabaseClient().from.bind(getSupabaseClient()); },
+  get rpc() { return getSupabaseClient().rpc.bind(getSupabaseClient()); },
+  get storage() { return getSupabaseClient().storage; },
+  get realtime() { return getSupabaseClient().realtime; },
+  get rest() { return getSupabaseClient().rest; },
+} as SupabaseClient;
 
-export const supabaseAdmin = new Proxy({} as SupabaseClient, {
-  get(_target, prop) {
-    return getSupabaseAdmin()[prop as keyof SupabaseClient];
-  }
-});
+export const supabaseAdmin = {
+  get auth() { return getSupabaseAdmin().auth; },
+  get from() { return getSupabaseAdmin().from.bind(getSupabaseAdmin()); },
+  get rpc() { return getSupabaseAdmin().rpc.bind(getSupabaseAdmin()); },
+  get storage() { return getSupabaseAdmin().storage; },
+  get realtime() { return getSupabaseAdmin().realtime; },
+  get rest() { return getSupabaseAdmin().rest; },
+} as SupabaseClient;
 
 export default supabaseClient;
-
