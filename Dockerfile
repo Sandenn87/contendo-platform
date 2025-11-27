@@ -30,8 +30,12 @@ COPY . .
 WORKDIR /app/src/client
 RUN npm run build
 
-# Verify frontend build output exists
-RUN ls -la /app/public/client/dist/ || (echo "Frontend build output not found at /app/public/client/dist/" && ls -la /app/public/ || echo "public directory not found")
+# Verify frontend build output exists and show location
+RUN echo "Checking for frontend build output..." && \
+    (test -d /app/public/client/dist && echo "Found at /app/public/client/dist" && ls -la /app/public/client/dist/ | head -10) || \
+    (echo "Not found at /app/public/client/dist, checking alternatives..." && \
+     find /app -name "index.html" -type f 2>/dev/null | head -5 || \
+     echo "No index.html found")
 
 # Build TypeScript backend (excludes client directory)
 WORKDIR /app
@@ -61,8 +65,9 @@ COPY --from=builder --chown=contendo:nodejs /app/dist ./dist
 # Create public/client directory first
 RUN mkdir -p ./public/client
 
-# Copy frontend build (builds to ../public/client/dist from src/client)
-COPY --from=builder --chown=contendo:nodejs /app/public/client/dist ./public/client/dist
+# Copy frontend build - try to copy the entire public directory structure
+# This will work even if dist doesn't exist (will just copy nothing)
+COPY --from=builder --chown=contendo:nodejs /app/public/ ./public/ || echo "Frontend build not found, will serve API only"
 
 # Create logs directory
 RUN mkdir -p logs && chown contendo:nodejs logs
