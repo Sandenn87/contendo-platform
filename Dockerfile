@@ -16,7 +16,8 @@ COPY package*.json ./
 # Install backend dependencies (including dev dependencies for build)
 RUN npm ci
 
-# Install frontend dependencies
+# Create frontend directory and install frontend dependencies
+RUN mkdir -p src/client
 WORKDIR /app/src/client
 COPY src/client/package*.json ./
 RUN npm ci
