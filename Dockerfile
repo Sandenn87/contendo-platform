@@ -62,12 +62,12 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy built application
 COPY --from=builder --chown=contendo:nodejs /app/dist ./dist
 
-# Create public/client directory first
+# Create public directory structure
 RUN mkdir -p ./public/client
 
-# Copy frontend build - try to copy the entire public directory structure
-# This will work even if dist doesn't exist (will just copy nothing)
-COPY --from=builder --chown=contendo:nodejs /app/public/ ./public/ || echo "Frontend build not found, will serve API only"
+# Copy frontend build - copy the entire public directory if it exists
+# This ensures we get the dist subdirectory
+COPY --from=builder --chown=contendo:nodejs /app/public ./public
 
 # Create logs directory
 RUN mkdir -p logs && chown contendo:nodejs logs
