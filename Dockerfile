@@ -31,6 +31,9 @@ WORKDIR /app/src/client
 RUN npm run build
 WORKDIR /app
 
+# Verify frontend build output exists
+RUN ls -la /app/public/client/dist || echo "Frontend build output not found"
+
 # Build TypeScript backend (excludes client directory)
 RUN npm run build
 
@@ -54,6 +57,9 @@ RUN npm ci --only=production && npm cache clean --force
 
 # Copy built application
 COPY --from=builder --chown=contendo:nodejs /app/dist ./dist
+
+# Copy frontend build (create directory first if needed)
+RUN mkdir -p ./public/client
 COPY --from=builder --chown=contendo:nodejs /app/public/client/dist ./public/client/dist
 
 # Create logs directory
