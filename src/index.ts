@@ -1,5 +1,42 @@
-import { ContendoServer } from './server';
-import logger from './utils/logger';
+// Add error handling at the very top level
+process.on('uncaughtException', (error: Error) => {
+  console.error('❌ UNCAUGHT EXCEPTION:', error.message);
+  console.error('Stack:', error.stack);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason: any) => {
+  console.error('❌ UNHANDLED REJECTION:', reason);
+  process.exit(1);
+});
+
+console.log('Loading modules...');
+
+let ContendoServer: any;
+let logger: any;
+
+try {
+  console.log('Importing server module...');
+  const serverModule = require('./server');
+  ContendoServer = serverModule.ContendoServer;
+  console.log('Server module loaded');
+} catch (error) {
+  console.error('❌ Failed to import server module:', error);
+  process.exit(1);
+}
+
+try {
+  console.log('Importing logger...');
+  logger = require('./utils/logger').default;
+  console.log('Logger loaded');
+} catch (error) {
+  console.error('❌ Failed to import logger:', error);
+  // Continue without logger
+  logger = {
+    info: (...args: any[]) => console.log('[INFO]', ...args),
+    error: (...args: any[]) => console.error('[ERROR]', ...args)
+  };
+}
 
 async function main(): Promise<void> {
   try {
