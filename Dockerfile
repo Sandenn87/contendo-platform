@@ -1,5 +1,5 @@
 # Multi-stage build for Contendo Business Management Platform
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache \
@@ -42,7 +42,7 @@ WORKDIR /app
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 # Install runtime dependencies
 RUN apk add --no-cache \
