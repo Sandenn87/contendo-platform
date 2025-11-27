@@ -43,35 +43,45 @@ export class ContendoServer {
   private dashboardService: DashboardService;
 
   constructor() {
-    this.app = express();
-    this.httpServer = createServer(this.app);
-    this.startTime = new Date();
-    this.port = parseInt(process.env.PORT || '3000');
+    try {
+      console.log('Initializing ContendoServer...');
+      this.app = express();
+      this.httpServer = createServer(this.app);
+      this.startTime = new Date();
+      this.port = parseInt(process.env.PORT || '3000');
 
-    // Initialize services
-    this.healthcareService = new HealthcareService();
-    this.trainingService = new TrainingService();
-    this.arbiterService = new ArbiterService();
-    this.hubspotService = new HubSpotService();
-    this.quickbooksService = new QuickBooksService();
-    this.outlookService = new OutlookService();
-    this.aiService = new AIService(
-      this.healthcareService,
-      this.trainingService,
-      this.arbiterService,
-      this.quickbooksService
-    );
-    this.dashboardService = new DashboardService(
-      this.healthcareService,
-      this.trainingService,
-      this.arbiterService,
-      this.quickbooksService,
-      this.aiService
-    );
+      console.log('Initializing services...');
+      // Initialize services
+      this.healthcareService = new HealthcareService();
+      this.trainingService = new TrainingService();
+      this.arbiterService = new ArbiterService();
+      this.hubspotService = new HubSpotService();
+      this.quickbooksService = new QuickBooksService();
+      this.outlookService = new OutlookService();
+      this.aiService = new AIService(
+        this.healthcareService,
+        this.trainingService,
+        this.arbiterService,
+        this.quickbooksService
+      );
+      this.dashboardService = new DashboardService(
+        this.healthcareService,
+        this.trainingService,
+        this.arbiterService,
+        this.quickbooksService,
+        this.aiService
+      );
 
-    this.setupMiddleware();
-    this.setupRoutes();
-    this.setupErrorHandling();
+      console.log('Setting up middleware and routes...');
+      this.setupMiddleware();
+      this.setupRoutes();
+      this.setupErrorHandling();
+      console.log('ContendoServer initialized successfully');
+    } catch (error) {
+      console.error('Error in ContendoServer constructor:', error);
+      console.error('Stack:', error instanceof Error ? error.stack : error);
+      throw error;
+    }
   }
 
   private setupMiddleware(): void {
