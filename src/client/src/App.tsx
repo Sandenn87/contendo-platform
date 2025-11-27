@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { supabaseClient } from '../lib/supabase';
+import { supabaseClient } from './lib/supabase';
 import Dashboard from './pages/Dashboard';
 import Healthcare from './pages/Healthcare';
 import Training from './pages/Training';
@@ -16,15 +16,15 @@ function App() {
 
   useEffect(() => {
     // Check for existing session
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    supabaseClient.auth.getSession().then(({ data }: { data: { session: any } }) => {
+      setUser(data.session?.user ?? null);
       setLoading(false);
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+    } = supabaseClient.auth.onAuthStateChange((_event: string, session: any) => {
       setUser(session?.user ?? null);
     });
 

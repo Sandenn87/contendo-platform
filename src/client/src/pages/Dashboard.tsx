@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
-import { TrendingUp, TrendingDown, DollarSign, Users, Building2, AlertCircle } from 'lucide-react';
+import { DollarSign, Building2, AlertCircle } from 'lucide-react';
 
 export default function Dashboard() {
   const [data, setData] = useState<any>(null);
