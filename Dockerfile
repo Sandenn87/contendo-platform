@@ -10,26 +10,27 @@ RUN apk add --no-cache \
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy backend package files
 COPY package*.json ./
 
-# Install all dependencies (including dev dependencies for build)
+# Install backend dependencies (including dev dependencies for build)
 RUN npm ci
 
-# Copy source code
-COPY . .
-
-# Install frontend dependencies first
+# Install frontend dependencies
 WORKDIR /app/src/client
 COPY src/client/package*.json ./
 RUN npm ci
+WORKDIR /app
 
-# Build frontend
-COPY src/client/ ./
+# Copy source code (after dependencies are installed)
+COPY . .
+
+# Build frontend first (needs node_modules)
+WORKDIR /app/src/client
 RUN npm run build
+WORKDIR /app
 
 # Build TypeScript backend (excludes client directory)
-WORKDIR /app
 RUN npm run build
 
 # Production stage
