@@ -19,16 +19,18 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build TypeScript backend (excludes client directory)
-RUN npm run build
-
-# Build frontend
+# Install frontend dependencies first
 WORKDIR /app/src/client
 COPY src/client/package*.json ./
 RUN npm ci
+
+# Build frontend
 COPY src/client/ ./
 RUN npm run build
+
+# Build TypeScript backend (excludes client directory)
 WORKDIR /app
+RUN npm run build
 
 # Production stage
 FROM node:18-alpine AS production
