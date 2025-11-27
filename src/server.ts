@@ -144,7 +144,7 @@ export class ContendoServer {
 
     // Serve static files from React build (in production)
     if (process.env.NODE_ENV === 'production') {
-      this.app.use(express.static(path.join(__dirname, '../client/dist')));
+      this.app.use(express.static(path.join(__dirname, '../public/client/dist')));
     }
   }
 
@@ -187,7 +187,7 @@ export class ContendoServer {
     // In production, serve React app for all non-API routes
     if (process.env.NODE_ENV === 'production') {
       this.app.get('*', (req: Request, res: Response) => {
-        res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+        res.sendFile(path.join(__dirname, '../public/client/dist/index.html'));
       });
     } else {
       // In development, redirect to React dev server
