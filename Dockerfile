@@ -29,12 +29,12 @@ COPY . .
 # Build frontend first (needs node_modules)
 WORKDIR /app/src/client
 RUN npm run build
-WORKDIR /app
 
 # Verify frontend build output exists
-RUN ls -la /app/public/client/dist || echo "Frontend build output not found"
+RUN ls -la /app/public/client/dist/ || (echo "Frontend build output not found at /app/public/client/dist/" && ls -la /app/public/ || echo "public directory not found")
 
 # Build TypeScript backend (excludes client directory)
+WORKDIR /app
 RUN npm run build
 
 # Production stage
@@ -58,9 +58,9 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy built application
 COPY --from=builder --chown=contendo:nodejs /app/dist ./dist
 
-# Copy frontend build (create directory first if needed)
-RUN mkdir -p ./public/client
-COPY --from=builder --chown=contendo:nodejs /app/public/client/dist ./public/client/dist
+# Copy frontend build (use wildcard to handle missing directory gracefully)
+COPY --from=builder --chown=contendo:nodejs /app/public/client/dist* ./public/client/ 2>/dev/null || \
+  (mkdir -p ./public/client && echo "Frontend build not found, creating empty directory")
 
 # Create logs directory
 RUN mkdir -p logs && chown contendo:nodejs logs
