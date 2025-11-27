@@ -58,9 +58,11 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy built application
 COPY --from=builder --chown=contendo:nodejs /app/dist ./dist
 
-# Copy frontend build (use wildcard to handle missing directory gracefully)
-COPY --from=builder --chown=contendo:nodejs /app/public/client/dist* ./public/client/ 2>/dev/null || \
-  (mkdir -p ./public/client && echo "Frontend build not found, creating empty directory")
+# Create public/client directory first
+RUN mkdir -p ./public/client
+
+# Copy frontend build
+COPY --from=builder --chown=contendo:nodejs /app/public/client/dist ./public/client/dist
 
 # Create logs directory
 RUN mkdir -p logs && chown contendo:nodejs logs
