@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoAutoTee - Automated Golf Booking</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <i class="fas fa-golf-ball"></i>
+                    <span>ChronoAutoTee</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#dashboard" class="nav-link active" data-page="dashboard">Dashboard</a></li>
+                    <li><a href="#configurations" class="nav-link" data-page="configurations">Bookings</a></li>
+                    <li><a href="#courses" class="nav-link" data-page="courses">Courses</a></li>
+                    <li><a href="#history" class="nav-link" data-page="history">History</a></li>
+                    <li><a href="#settings" class="nav-link" data-page="settings">Settings</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page active">
+                <div class="page-header">
+                    <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
+                    <p>Monitor your automated tee time bookings</p>
+                </div>
+
+                <!-- Status Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="active-bookings">0</h3>
+                            <p>Active Bookings</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="successful-bookings">0</h3>
+                            <p>Successful Bookings</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="next-check">--</h3>
+                            <p>Next Check</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon status-indicator" id="health-indicator">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="system-status">Checking...</h3>
+                            <p>System Status</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Activity Feed -->
+                <div class="activity-section">
+                    <h2><i class="fas fa-list"></i> Live Activity</h2>
+                    <div class="activity-feed" id="activity-feed">
+                        <div class="activity-item">
+                            <i class="fas fa-info-circle"></i>
+                            <span>System started - monitoring for tee times...</span>
+                            <small>Just now</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configurations Page -->
+            <div id="configurations-page" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-calendar-plus"></i> Booking Configurations</h1>
+                    <button class="btn btn-primary" id="add-configuration-btn">
+                        <i class="fas fa-plus"></i> New Booking
+                    </button>
+                </div>
+
+                <div class="configurations-grid" id="configurations-grid">
+                    <!-- Configuration cards will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- Courses Page -->
+            <div id="courses-page" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-golf-ball"></i> Golf Courses</h1>
+                    <p>Discover and configure golf courses</p>
+                </div>
+
+                <div class="search-section">
+                    <div class="search-bar">
+                        <input type="text" id="course-search" placeholder="Search for golf courses...">
+                        <button class="btn btn-primary" id="search-courses-btn">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+
+                <div class="courses-grid" id="courses-grid">
+                    <!-- Course cards will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- History Page -->
+            <div id="history-page" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-history"></i> Booking History</h1>
+                    <p>View your past booking attempts and results</p>
+                </div>
+
+                <div class="history-filters">
+                    <select id="history-filter">
+                        <option value="all">All Bookings</option>
+                        <option value="success">Successful</option>
+                        <option value="failed">Failed</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                    <input type="date" id="history-date-from">
+                    <input type="date" id="history-date-to">
+                </div>
+
+                <div class="history-table-container">
+                    <table class="history-table" id="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Course</th>
+                                <th>Tee Time</th>
+                                <th>Status</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <!-- History rows will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings-page" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-cog"></i> Settings</h1>
+                    <p>Configure global system settings</p>
+                </div>
+
+                <div class="settings-sections">
+                    <!-- Notification Settings -->
+                    <div class="settings-section">
+                        <h3><i class="fas fa-bell"></i> Notifications</h3>
+                        <div class="setting-group">
+                            <label for="email-notifications">Email Notifications</label>
+                            <div class="setting-row">
+                                <input type="checkbox" id="email-notifications">
+                                <input type="email" id="notification-email" placeholder="your@email.com">
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <label for="pushover-notifications">Pushover Notifications</label>
+                            <div class="setting-row">
+                                <input type="checkbox" id="pushover-notifications">
+                                <input type="text" id="pushover-user-key" placeholder="User Key">
+                                <input type="text" id="pushover-app-token" placeholder="App Token">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SMTP Settings -->
+                    <div class="settings-section">
+                        <h3><i class="fas fa-envelope"></i> Email Configuration</h3>
+                        <div class="setting-group">
+                            <label for="smtp-host">SMTP Host</label>
+                            <input type="text" id="smtp-host" placeholder="smtp.gmail.com">
+                        </div>
+                        <div class="setting-group">
+                            <label for="smtp-port">SMTP Port</label>
+                            <input type="number" id="smtp-port" placeholder="587">
+                        </div>
+                        <div class="setting-group">
+                            <label for="smtp-user">SMTP Username</label>
+                            <input type="email" id="smtp-user" placeholder="your@gmail.com">
+                        </div>
+                        <div class="setting-group">
+                            <label for="smtp-pass">SMTP Password</label>
+                            <input type="password" id="smtp-pass" placeholder="App Password">
+                        </div>
+                    </div>
+
+                    <!-- System Settings -->
+                    <div class="settings-section">
+                        <h3><i class="fas fa-server"></i> System</h3>
+                        <div class="setting-group">
+                            <label for="default-polling-interval">Default Polling Interval (seconds)</label>
+                            <input type="number" id="default-polling-interval" value="90" min="30" max="3600">
+                        </div>
+                        <div class="setting-group">
+                            <label for="max-retries">Maximum Retries</label>
+                            <input type="number" id="max-retries" value="5" min="1" max="10">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="save-settings-btn">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Configuration Modal -->
+        <div id="configuration-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-calendar-plus"></i> <span id="modal-title">New Booking Configuration</span></h2>
+                    <button class="modal-close" id="modal-close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="configuration-form">
+                        <!-- Step 1: Authentication -->
+                        <div class="form-step active" data-step="1">
+                            <h3>Step 1: Authentication</h3>
+                            <div class="auth-type-selector">
+                                <label class="radio-card">
+                                    <input type="radio" name="authType" value="partner_api">
+                                    <div class="radio-content">
+                                        <i class="fas fa-key"></i>
+                                        <h4>Partner API</h4>
+                                        <p>Recommended - More reliable</p>
+                                    </div>
+                                </label>
+                                <label class="radio-card">
+                                    <input type="radio" name="authType" value="web" checked>
+                                    <div class="radio-content">
+                                        <i class="fas fa-globe"></i>
+                                        <h4>Web Login</h4>
+                                        <p>Use your Chronogolf credentials</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Partner API Fields -->
+                            <div id="partner-api-fields" class="auth-fields" style="display: none;">
+                                <div class="form-group">
+                                    <label for="api-token">API Token</label>
+                                    <input type="password" id="api-token" placeholder="Your Lightspeed Partner API token">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="org-id">Organization ID</label>
+                                        <input type="text" id="org-id" placeholder="Organization ID">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="facility-id">Facility ID</label>
+                                        <input type="text" id="facility-id" placeholder="Facility ID">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Web Auth Fields -->
+                            <div id="web-auth-fields" class="auth-fields">
+                                <div class="form-group">
+                                    <label for="chronogolf-email">Chronogolf Email</label>
+                                    <input type="email" id="chronogolf-email" placeholder="your@email.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="chronogolf-password">Chronogolf Password</label>
+                                    <input type="password" id="chronogolf-password" placeholder="Your password" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Course Selection -->
+                        <div class="form-step" data-step="2">
+                            <h3>Step 2: Course Selection</h3>
+                            <div class="form-group">
+                                <label for="course-select">Golf Course</label>
+                                <div class="course-search-container">
+                                    <input type="text" id="course-search-input" placeholder="Search for your golf course...">
+                                    <button type="button" id="test-connection-btn" class="btn btn-secondary">
+                                        <i class="fas fa-search"></i> Search Courses
+                                    </button>
+                                </div>
+                                <div id="course-results" class="course-results"></div>
+                            </div>
+
+                            <!-- Selected Course Info -->
+                            <div id="selected-course-info" class="selected-course" style="display: none;">
+                                <h4>Selected Course</h4>
+                                <div class="course-card">
+                                    <div class="course-details">
+                                        <h5 id="selected-course-name"></h5>
+                                        <p id="selected-course-location"></p>
+                                    </div>
+                                    <button type="button" id="change-course-btn" class="btn btn-outline">Change</button>
+                                </div>
+                            </div>
+
+                            <!-- Tee Time Release Settings -->
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="enable-release-monitoring"> 
+                                    Monitor Tee Time Releases
+                                </label>
+                                <p class="form-help">Enable this to automatically check when new tee times are released</p>
+                            </div>
+
+                            <div id="release-settings" class="release-settings" style="display: none;">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="release-time">Release Time</label>
+                                        <input type="time" id="release-time" value="07:00">
+                                        <p class="form-help">When does this course release new tee times?</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="release-days">Days in Advance</label>
+                                        <input type="number" id="release-days" value="7" min="1" max="30">
+                                        <p class="form-help">How many days in advance are tee times released?</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Booking Preferences -->
+                        <div class="form-step" data-step="3">
+                            <h3>Step 3: Booking Preferences</h3>
+                            
+                            <!-- Party Size -->
+                            <div class="form-group">
+                                <label for="party-size">Number of Players</label>
+                                <select id="party-size" required>
+                                    <option value="1">1 Player</option>
+                                    <option value="2">2 Players</option>
+                                    <option value="3">3 Players</option>
+                                    <option value="4" selected>4 Players</option>
+                                </select>
+                            </div>
+
+                            <!-- Player Names -->
+                            <div class="form-group">
+                                <label>Player Names</label>
+                                <div id="player-names-container">
+                                    <input type="text" class="player-name" placeholder="Player 1 Name" required>
+                                    <input type="text" class="player-name" placeholder="Player 2 Name">
+                                    <input type="text" class="player-name" placeholder="Player 3 Name">
+                                    <input type="text" class="player-name" placeholder="Player 4 Name">
+                                </div>
+                            </div>
+
+                            <!-- Preferred Time -->
+                            <div class="form-group">
+                                <label for="preferred-time">Preferred Tee Time</label>
+                                <input type="time" id="preferred-time" required>
+                            </div>
+
+                            <!-- Time Flexibility -->
+                            <div class="form-group">
+                                <label for="time-flexibility">Time Flexibility (± minutes)</label>
+                                <input type="range" id="time-flexibility" min="0" max="120" value="30" step="15">
+                                <div class="range-labels">
+                                    <span>Exact time</span>
+                                    <span id="flexibility-value">30 minutes</span>
+                                    <span>2 hours</span>
+                                </div>
+                                <p class="form-help">How flexible are you with the tee time? (e.g., ±30 minutes)</p>
+                            </div>
+
+                            <!-- Date Range -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="date-start">Start Date</label>
+                                    <input type="date" id="date-start" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="date-end">End Date</label>
+                                    <input type="date" id="date-end" required>
+                                </div>
+                            </div>
+
+                            <!-- Days of Week -->
+                            <div class="form-group">
+                                <label>Days of Week</label>
+                                <div class="days-selector">
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" value="Mon" checked> Mon
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" value="Tue" checked> Tue
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" value="Wed" checked> Wed
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" value="Thu" checked> Thu
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" value="Fri" checked> Fri
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" value="Sat" checked> Sat
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" value="Sun" checked> Sun
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Course Preferences -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="walking-cart">Walking/Cart</label>
+                                    <select id="walking-cart">
+                                        <option value="either">Either</option>
+                                        <option value="walking">Walking Only</option>
+                                        <option value="cart">Cart Required</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="holes">Number of Holes</label>
+                                    <select id="holes">
+                                        <option value="either">Either</option>
+                                        <option value="9">9 Holes</option>
+                                        <option value="18" selected>18 Holes</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Max Price -->
+                            <div class="form-group">
+                                <label for="max-price">Maximum Price (optional)</label>
+                                <input type="number" id="max-price" placeholder="150.00" step="0.01" min="0">
+                                <p class="form-help">Leave empty for no price limit</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Monitoring Settings -->
+                        <div class="form-step" data-step="4">
+                            <h3>Step 4: Monitoring Settings</h3>
+                            
+                            <!-- Polling Settings -->
+                            <div class="form-group">
+                                <label for="polling-interval">Check Interval (seconds)</label>
+                                <input type="number" id="polling-interval" value="90" min="30" max="3600">
+                                <p class="form-help">How often to check for available tee times</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="max-retries-config">Maximum Retries</label>
+                                <input type="number" id="max-retries-config" value="5" min="1" max="10">
+                                <p class="form-help">How many times to retry failed booking attempts</p>
+                            </div>
+
+                            <!-- Notifications -->
+                            <div class="form-group">
+                                <label>Notifications</label>
+                                <div class="notification-options">
+                                    <label class="checkbox-option">
+                                        <input type="checkbox" id="enable-email-notifications" checked>
+                                        <span>Email Notifications</span>
+                                    </label>
+                                    <label class="checkbox-option">
+                                        <input type="checkbox" id="enable-pushover-notifications">
+                                        <span>Pushover Notifications</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step Navigation -->
+                        <div class="step-navigation">
+                            <button type="button" id="prev-step-btn" class="btn btn-secondary" style="display: none;">
+                                <i class="fas fa-arrow-left"></i> Previous
+                            </button>
+                            <div class="step-indicators">
+                                <span class="step-indicator active" data-step="1">1</span>
+                                <span class="step-indicator" data-step="2">2</span>
+                                <span class="step-indicator" data-step="3">3</span>
+                                <span class="step-indicator" data-step="4">4</span>
+                            </div>
+                            <button type="button" id="next-step-btn" class="btn btn-primary">
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                            <button type="submit" id="save-configuration-btn" class="btn btn-success" style="display: none;">
+                                <i class="fas fa-save"></i> Save Configuration
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
+
+
+
+
+

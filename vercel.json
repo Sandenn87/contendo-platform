@@ -1,0 +1,14 @@
+{
+  "buildCommand": "cd src/client && npm install && npm run build",
+  "outputDirectory": "src/client/dist",
+  "devCommand": "cd src/client && npm run dev",
+  "installCommand": "cd src/client && npm install",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "http://localhost:3000/api/$1"
+    }
+  ]
+}
+
