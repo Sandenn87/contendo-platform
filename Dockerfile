@@ -61,7 +61,7 @@ COPY --from=builder --chown=contendo:nodejs /app/dist ./dist
 # Create public/client directory first
 RUN mkdir -p ./public/client
 
-# Copy frontend build
+# Copy frontend build (builds to ../public/client/dist from src/client)
 COPY --from=builder --chown=contendo:nodejs /app/public/client/dist ./public/client/dist
 
 # Create logs directory
