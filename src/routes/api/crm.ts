@@ -13,7 +13,7 @@ export function createCrmRouter(
   router.use(authenticateUser);
 
   // HubSpot OAuth initiation
-  router.get('/hubspot/auth', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/hubspot/auth', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const authUrl = await hubspotService.getAuthUrl();
       res.json({ authUrl });
@@ -24,11 +24,11 @@ export function createCrmRouter(
   });
 
   // HubSpot OAuth callback
-  router.get('/hubspot/callback', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/hubspot/callback', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { code } = req.query;
       if (!code) {
-        return res.status(400).json({ error: 'Authorization code required' });
+        res.status(400).json({ error: 'Authorization code required' }); return;
       }
       const result = await hubspotService.handleCallback(req.user!.id, code as string);
       res.json(result);
@@ -39,7 +39,7 @@ export function createCrmRouter(
   });
 
   // Sync contacts from HubSpot
-  router.post('/hubspot/sync/contacts', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/hubspot/sync/contacts', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const result = await hubspotService.syncContacts(req.user!.id);
       res.json(result);
@@ -50,7 +50,7 @@ export function createCrmRouter(
   });
 
   // Sync accounts from HubSpot
-  router.post('/hubspot/sync/accounts', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/hubspot/sync/accounts', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const result = await hubspotService.syncAccounts(req.user!.id);
       res.json(result);
@@ -61,7 +61,7 @@ export function createCrmRouter(
   });
 
   // Sync deals from HubSpot
-  router.post('/hubspot/sync/deals', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/hubspot/sync/deals', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const result = await hubspotService.syncDeals(req.user!.id);
       res.json(result);
@@ -72,7 +72,7 @@ export function createCrmRouter(
   });
 
   // Get deal stage change notifications
-  router.get('/hubspot/deal-changes', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/hubspot/deal-changes', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { since } = req.query;
       const changes = await hubspotService.getDealStageChanges(req.user!.id, since as string);
@@ -84,7 +84,7 @@ export function createCrmRouter(
   });
 
   // Microsoft Graph OAuth initiation
-  router.get('/outlook/auth', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/outlook/auth', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const authUrl = await outlookService.getAuthUrl();
       res.json({ authUrl });
@@ -95,11 +95,11 @@ export function createCrmRouter(
   });
 
   // Microsoft Graph OAuth callback
-  router.get('/outlook/callback', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/outlook/callback', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { code } = req.query;
       if (!code) {
-        return res.status(400).json({ error: 'Authorization code required' });
+        res.status(400).json({ error: 'Authorization code required' }); return;
       }
       const result = await outlookService.handleCallback(req.user!.id, code as string);
       res.json(result);
@@ -110,7 +110,7 @@ export function createCrmRouter(
   });
 
   // Scan emails and update HubSpot
-  router.post('/outlook/scan-emails', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/outlook/scan-emails', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { days = '7' } = req.body;
       const result = await outlookService.scanAndUpdateHubSpot(req.user!.id, parseInt(days));
@@ -122,7 +122,7 @@ export function createCrmRouter(
   });
 
   // Get all contacts
-  router.get('/contacts', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/contacts', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const contacts = await hubspotService.getContacts();
       res.json(contacts);
@@ -133,7 +133,7 @@ export function createCrmRouter(
   });
 
   // Get all accounts
-  router.get('/accounts', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/accounts', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const accounts = await hubspotService.getAccounts();
       res.json(accounts);
@@ -144,7 +144,7 @@ export function createCrmRouter(
   });
 
   // Link contact to account
-  router.post('/contacts/:contactId/accounts/:accountId', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/contacts/:contactId/accounts/:accountId', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const result = await hubspotService.linkContactToAccount(
         req.params.contactId,

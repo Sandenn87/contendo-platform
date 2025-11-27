@@ -12,7 +12,7 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   router.use(authenticateUser);
 
   // QuickBooks OAuth initiation
-  router.get('/quickbooks/auth', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/quickbooks/auth', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const authUrl = await quickbooksService.getAuthUrl();
       res.json({ authUrl });
@@ -23,11 +23,11 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   });
 
   // QuickBooks OAuth callback
-  router.get('/quickbooks/callback', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/quickbooks/callback', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { code, realmId } = req.query;
       if (!code || !realmId) {
-        return res.status(400).json({ error: 'Authorization code and realm ID required' });
+        res.status(400).json({ error: 'Authorization code and realm ID required' }); return;
       }
       const result = await quickbooksService.handleCallback(
         req.user!.id,
@@ -42,7 +42,7 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   });
 
   // Sync invoices from QuickBooks
-  router.post('/quickbooks/sync/invoices', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/quickbooks/sync/invoices', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const result = await quickbooksService.syncInvoices(req.user!.id);
       res.json(result);
@@ -53,7 +53,7 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   });
 
   // Sync expenses from QuickBooks
-  router.post('/quickbooks/sync/expenses', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/quickbooks/sync/expenses', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const result = await quickbooksService.syncExpenses(req.user!.id);
       res.json(result);
@@ -64,7 +64,7 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   });
 
   // Get P&L report
-  router.get('/pl', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/pl', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { period, startDate, endDate } = req.query;
       const pl = await quickbooksService.getProfitLoss(
@@ -81,7 +81,7 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   });
 
   // Get cash flow projection
-  router.get('/cash-flow', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/cash-flow', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { days = '30' } = req.query;
       const cashFlow = await quickbooksService.getCashFlowProjection(req.user!.id, parseInt(days as string));
@@ -93,7 +93,7 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   });
 
   // Get financial health metrics
-  router.get('/health', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/health', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const health = await quickbooksService.getFinancialHealth(req.user!.id);
       res.json(health);
@@ -104,10 +104,11 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   });
 
   // Upload receipt
-  router.post('/receipts', upload.single('receipt'), async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/receipts', upload.single('receipt'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       if (!req.file) {
-        return res.status(400).json({ error: 'Receipt file required' });
+        res.status(400).json({ error: 'Receipt file required' }); return;
+        return;
       }
       const receipt = await quickbooksService.processReceipt(req.user!.id, req.file);
       res.status(201).json(receipt);
@@ -118,7 +119,7 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   });
 
   // Get receipts
-  router.get('/receipts', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/receipts', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { status } = req.query;
       const receipts = await quickbooksService.getReceipts(req.user!.id, status as string);
@@ -130,7 +131,7 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   });
 
   // Create expense from receipt
-  router.post('/receipts/:receiptId/expense', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/receipts/:receiptId/expense', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const expense = await quickbooksService.createExpenseFromReceipt(
         req.user!.id,
@@ -145,7 +146,7 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   });
 
   // Get financial snapshots
-  router.get('/snapshots', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/snapshots', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { periodType, startDate, endDate } = req.query;
       const snapshots = await quickbooksService.getFinancialSnapshots({

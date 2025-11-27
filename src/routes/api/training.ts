@@ -9,7 +9,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   router.use(authenticateUser);
 
   // Get all training projects
-  router.get('/projects', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/projects', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const projects = await trainingService.getProjects();
       res.json(projects);
@@ -20,11 +20,11 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Get single project
-  router.get('/projects/:id', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/projects/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const project = await trainingService.getProject(req.params.id);
       if (!project) {
-        return res.status(404).json({ error: 'Project not found' });
+        res.status(404).json({ error: 'Project not found' }); return;
       }
       res.json(project);
     } catch (error) {
@@ -34,7 +34,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Create project
-  router.post('/projects', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/projects', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const project = await trainingService.createProject(req.body);
       res.status(201).json(project);
@@ -45,11 +45,11 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Update project
-  router.put('/projects/:id', async (req: AuthenticatedRequest, res: Response) => {
+  router.put('/projects/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const project = await trainingService.updateProject(req.params.id, req.body);
       if (!project) {
-        return res.status(404).json({ error: 'Project not found' });
+        res.status(404).json({ error: 'Project not found' }); return;
       }
       res.json(project);
     } catch (error) {
@@ -59,7 +59,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Get milestones for a project
-  router.get('/projects/:projectId/milestones', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/projects/:projectId/milestones', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const milestones = await trainingService.getMilestones(req.params.projectId);
       res.json(milestones);
@@ -70,7 +70,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Create/update milestone
-  router.post('/projects/:projectId/milestones', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/projects/:projectId/milestones', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const milestone = await trainingService.createMilestone(req.params.projectId, req.body);
       res.status(201).json(milestone);
@@ -81,11 +81,11 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Update milestone progress
-  router.put('/milestones/:id', async (req: AuthenticatedRequest, res: Response) => {
+  router.put('/milestones/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const milestone = await trainingService.updateMilestone(req.params.id, req.body);
       if (!milestone) {
-        return res.status(404).json({ error: 'Milestone not found' });
+        res.status(404).json({ error: 'Milestone not found' }); return;
       }
       res.json(milestone);
     } catch (error) {
@@ -95,7 +95,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Get cost centers for a project
-  router.get('/projects/:projectId/cost-centers', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/projects/:projectId/cost-centers', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const costCenters = await trainingService.getCostCenters(req.params.projectId);
       res.json(costCenters);
@@ -106,7 +106,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Get employees for a project
-  router.get('/projects/:projectId/employees', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/projects/:projectId/employees', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const employees = await trainingService.getEmployees(req.params.projectId);
       res.json(employees);
@@ -117,7 +117,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Add employee to project
-  router.post('/projects/:projectId/employees', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/projects/:projectId/employees', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const employee = await trainingService.addEmployee(req.params.projectId, req.body);
       res.status(201).json(employee);
@@ -128,11 +128,11 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Update employee hours/costs
-  router.put('/employees/:id', async (req: AuthenticatedRequest, res: Response) => {
+  router.put('/employees/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const employee = await trainingService.updateEmployee(req.params.id, req.body);
       if (!employee) {
-        return res.status(404).json({ error: 'Employee not found' });
+        res.status(404).json({ error: 'Employee not found' }); return;
       }
       res.json(employee);
     } catch (error) {
@@ -142,7 +142,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Add project cost
-  router.post('/projects/:projectId/costs', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/projects/:projectId/costs', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const cost = await trainingService.addCost(req.params.projectId, req.body);
       res.status(201).json(cost);
@@ -153,7 +153,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Get P&L report
-  router.get('/projects/:projectId/pl', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/projects/:projectId/pl', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const pl = await trainingService.getProfitLossReport(req.params.projectId);
       res.json(pl);
@@ -164,7 +164,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Get invoices
-  router.get('/projects/:projectId/invoices', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/projects/:projectId/invoices', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const invoices = await trainingService.getInvoices(req.params.projectId);
       res.json(invoices);
@@ -175,7 +175,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Create invoice
-  router.post('/projects/:projectId/invoices', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/projects/:projectId/invoices', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const invoice = await trainingService.createInvoice(req.params.projectId, req.body);
       res.status(201).json(invoice);
@@ -186,7 +186,7 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
   });
 
   // Share report with contacts
-  router.post('/projects/:projectId/share-report', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/projects/:projectId/share-report', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { contactIds, reportType } = req.body;
       const result = await trainingService.shareReport(req.params.projectId, contactIds, reportType);

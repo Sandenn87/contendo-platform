@@ -9,7 +9,7 @@ export function createAIRouter(aiService: AIService): Router {
   router.use(authenticateUser);
 
   // Get AI recommendations
-  router.get('/recommendations', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/recommendations', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { limit = '10', category } = req.query;
       const recommendations = await aiService.getRecommendations(
@@ -25,7 +25,7 @@ export function createAIRouter(aiService: AIService): Router {
   });
 
   // Update recommendation status
-  router.put('/recommendations/:id', async (req: AuthenticatedRequest, res: Response) => {
+  router.put('/recommendations/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { status } = req.body;
       const recommendation = await aiService.updateRecommendationStatus(
@@ -33,7 +33,8 @@ export function createAIRouter(aiService: AIService): Router {
         status
       );
       if (!recommendation) {
-        return res.status(404).json({ error: 'Recommendation not found' });
+        res.status(404).json({ error: 'Recommendation not found' }); return;
+        return;
       }
       res.json(recommendation);
     } catch (error) {
@@ -43,11 +44,11 @@ export function createAIRouter(aiService: AIService): Router {
   });
 
   // Chat interface - ask questions
-  router.post('/chat', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/chat', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { question, context } = req.body;
       if (!question) {
-        return res.status(400).json({ error: 'Question is required' });
+        res.status(400).json({ error: 'Question is required' }); return;
       }
       const response = await aiService.askQuestion(req.user!.id, question, context);
       res.json(response);
@@ -58,7 +59,7 @@ export function createAIRouter(aiService: AIService): Router {
   });
 
   // Generate report
-  router.post('/generate-report', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/generate-report', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { reportType, parameters } = req.body;
       const report = await aiService.generateReport(req.user!.id, reportType, parameters);
@@ -70,7 +71,7 @@ export function createAIRouter(aiService: AIService): Router {
   });
 
   // Refresh recommendations (force recalculation)
-  router.post('/recommendations/refresh', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/recommendations/refresh', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const recommendations = await aiService.refreshRecommendations(req.user!.id);
       res.json(recommendations);

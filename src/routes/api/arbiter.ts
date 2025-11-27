@@ -9,7 +9,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   router.use(authenticateUser);
 
   // Get all deployments
-  router.get('/deployments', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/deployments', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const deployments = await arbiterService.getDeployments();
       res.json(deployments);
@@ -20,11 +20,11 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Get single deployment
-  router.get('/deployments/:id', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/deployments/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const deployment = await arbiterService.getDeployment(req.params.id);
       if (!deployment) {
-        return res.status(404).json({ error: 'Deployment not found' });
+        res.status(404).json({ error: 'Deployment not found' }); return;
       }
       res.json(deployment);
     } catch (error) {
@@ -34,7 +34,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Create deployment
-  router.post('/deployments', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/deployments', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const deployment = await arbiterService.createDeployment(req.body);
       res.status(201).json(deployment);
@@ -45,11 +45,11 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Update deployment
-  router.put('/deployments/:id', async (req: AuthenticatedRequest, res: Response) => {
+  router.put('/deployments/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const deployment = await arbiterService.updateDeployment(req.params.id, req.body);
       if (!deployment) {
-        return res.status(404).json({ error: 'Deployment not found' });
+        res.status(404).json({ error: 'Deployment not found' }); return;
       }
       res.json(deployment);
     } catch (error) {
@@ -59,7 +59,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Get server costs for deployment
-  router.get('/deployments/:deploymentId/server-costs', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/deployments/:deploymentId/server-costs', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const costs = await arbiterService.getServerCosts(req.params.deploymentId);
       res.json(costs);
@@ -70,7 +70,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Add server cost
-  router.post('/deployments/:deploymentId/server-costs', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/deployments/:deploymentId/server-costs', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const cost = await arbiterService.addServerCost(req.params.deploymentId, req.body);
       res.status(201).json(cost);
@@ -81,7 +81,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Get maintenance hours
-  router.get('/deployments/:deploymentId/maintenance', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/deployments/:deploymentId/maintenance', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const maintenance = await arbiterService.getMaintenance(req.params.deploymentId);
       res.json(maintenance);
@@ -92,7 +92,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Add maintenance hours
-  router.post('/deployments/:deploymentId/maintenance', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/deployments/:deploymentId/maintenance', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const maintenance = await arbiterService.addMaintenance(req.params.deploymentId, req.body);
       res.status(201).json(maintenance);
@@ -103,7 +103,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Get shared platform costs
-  router.get('/shared-costs', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/shared-costs', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const costs = await arbiterService.getSharedCosts();
       res.json(costs);
@@ -114,7 +114,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Add shared platform cost
-  router.post('/shared-costs', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/shared-costs', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const cost = await arbiterService.addSharedCost(req.body);
       res.status(201).json(cost);
@@ -125,7 +125,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Get profitability for deployment
-  router.get('/deployments/:deploymentId/profitability', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/deployments/:deploymentId/profitability', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const profitability = await arbiterService.getDeploymentProfitability(req.params.deploymentId);
       res.json(profitability);
@@ -136,7 +136,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Get overall platform profitability
-  router.get('/profitability', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/profitability', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const profitability = await arbiterService.getPlatformProfitability();
       res.json(profitability);
@@ -147,7 +147,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Get business metrics
-  router.get('/metrics', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/metrics', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const metrics = await arbiterService.getBusinessMetrics();
       res.json(metrics);
@@ -158,7 +158,7 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
   });
 
   // Update business metrics
-  router.post('/metrics', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/metrics', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const metrics = await arbiterService.updateBusinessMetrics(req.body);
       res.status(201).json(metrics);

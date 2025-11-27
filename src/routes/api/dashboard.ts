@@ -9,7 +9,7 @@ export function createDashboardRouter(dashboardService: DashboardService): Route
   router.use(authenticateUser);
 
   // Get main dashboard data
-  router.get('/', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const dashboard = await dashboardService.getDashboardData(req.user!.id);
       res.json(dashboard);
@@ -20,7 +20,7 @@ export function createDashboardRouter(dashboardService: DashboardService): Route
   });
 
   // Get healthcare division summary
-  router.get('/healthcare', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/healthcare', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const summary = await dashboardService.getHealthcareSummary();
       res.json(summary);
@@ -31,7 +31,7 @@ export function createDashboardRouter(dashboardService: DashboardService): Route
   });
 
   // Get training projects summary
-  router.get('/training', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/training', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const summary = await dashboardService.getTrainingSummary();
       res.json(summary);
@@ -42,7 +42,7 @@ export function createDashboardRouter(dashboardService: DashboardService): Route
   });
 
   // Get Arbiter summary
-  router.get('/arbiter', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/arbiter', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const summary = await dashboardService.getArbiterSummary();
       res.json(summary);
@@ -53,7 +53,7 @@ export function createDashboardRouter(dashboardService: DashboardService): Route
   });
 
   // Get financial summary
-  router.get('/financial', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/financial', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const summary = await dashboardService.getFinancialSummary(req.user!.id);
       res.json(summary);
@@ -64,7 +64,7 @@ export function createDashboardRouter(dashboardService: DashboardService): Route
   });
 
   // Get AI recommendations for dashboard
-  router.get('/ai-recommendations', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/ai-recommendations', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const recommendations = await dashboardService.getAIRecommendations(req.user!.id);
       res.json(recommendations);

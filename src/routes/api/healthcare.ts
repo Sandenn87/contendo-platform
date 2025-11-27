@@ -10,7 +10,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   router.use(authenticateUser);
 
   // Get all healthcare clients
-  router.get('/clients', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/clients', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const clients = await healthcareService.getClients();
       res.json(clients);
@@ -21,11 +21,12 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Get single client
-  router.get('/clients/:id', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/clients/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const client = await healthcareService.getClient(req.params.id);
       if (!client) {
-        return res.status(404).json({ error: 'Client not found' });
+        res.status(404).json({ error: 'Client not found' }); return;
+        return;
       }
       res.json(client);
     } catch (error) {
@@ -35,7 +36,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Create client
-  router.post('/clients', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/clients', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const client = await healthcareService.createClient(req.body);
       res.status(201).json(client);
@@ -46,11 +47,12 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Update client
-  router.put('/clients/:id', async (req: AuthenticatedRequest, res: Response) => {
+  router.put('/clients/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const client = await healthcareService.updateClient(req.params.id, req.body);
       if (!client) {
-        return res.status(404).json({ error: 'Client not found' });
+        res.status(404).json({ error: 'Client not found' }); return;
+        return;
       }
       res.json(client);
     } catch (error) {
@@ -60,7 +62,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Get projects for a client
-  router.get('/clients/:clientId/projects', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/clients/:clientId/projects', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const projects = await healthcareService.getProjectsByClient(req.params.clientId);
       res.json(projects);
@@ -71,7 +73,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Get SaaS agreements
-  router.get('/agreements', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/agreements', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { projectId, status } = req.query;
       const agreements = await healthcareService.getSaaSAgreements({
@@ -86,7 +88,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Get renewals due soon
-  router.get('/agreements/renewals', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/agreements/renewals', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { days = '30' } = req.query;
       const renewals = await healthcareService.getUpcomingRenewals(parseInt(days as string));
@@ -98,7 +100,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Create/update SaaS agreement
-  router.post('/agreements', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/agreements', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const agreement = await healthcareService.createSaaSAgreement(req.body);
       res.status(201).json(agreement);
@@ -109,7 +111,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Get developers
-  router.get('/developers', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/developers', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const developers = await healthcareService.getDevelopers();
       res.json(developers);
@@ -120,7 +122,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Assign developer to project
-  router.post('/projects/:projectId/developers', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/projects/:projectId/developers', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const assignment = await healthcareService.assignDeveloper(req.params.projectId, req.body);
       res.status(201).json(assignment);
@@ -131,7 +133,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Get developer estimates
-  router.get('/estimates', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/estimates', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { projectId, status } = req.query;
       const estimates = await healthcareService.getEstimates({
@@ -146,7 +148,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Approve/reject estimate
-  router.put('/estimates/:id', async (req: AuthenticatedRequest, res: Response) => {
+  router.put('/estimates/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { status, approvedBy } = req.body;
       const estimate = await healthcareService.updateEstimateStatus(
@@ -155,7 +157,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
         req.user!.id
       );
       if (!estimate) {
-        return res.status(404).json({ error: 'Estimate not found' });
+        res.status(404).json({ error: 'Estimate not found' }); return;
       }
       res.json(estimate);
     } catch (error) {
@@ -165,7 +167,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Get billing records
-  router.get('/billing', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/billing', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { projectId, status } = req.query;
       const billing = await healthcareService.getBilling({
@@ -180,7 +182,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Create billing record
-  router.post('/billing', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/billing', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const billing = await healthcareService.createBilling(req.body);
       res.status(201).json(billing);
@@ -191,7 +193,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Get profitability data
-  router.get('/profitability', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/profitability', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { projectId, clientId } = req.query;
       const profitability = await healthcareService.getProfitability({
@@ -206,7 +208,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Get meeting participants
-  router.get('/meetings/participants', async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/meetings/participants', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { projectId } = req.query;
       const participants = await healthcareService.getMeetingParticipants(req.params.projectId || projectId as string);
@@ -218,7 +220,7 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
   });
 
   // Add meeting participant
-  router.post('/meetings/participants', async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/meetings/participants', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const participant = await healthcareService.addMeetingParticipant(req.body);
       res.status(201).json(participant);

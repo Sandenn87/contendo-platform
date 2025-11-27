@@ -1,18 +1,11 @@
-# Multi-stage build for production
+# Multi-stage build for Contendo Business Management Platform
 FROM node:18-alpine AS builder
 
-# Install dependencies required for native modules and Playwright
+# Install build dependencies
 RUN apk add --no-cache \
     python3 \
     make \
-    g++ \
-    chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont
+    g++
 
 # Set working directory
 WORKDIR /app
@@ -26,47 +19,44 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build TypeScript
+# Build TypeScript backend (excludes client directory)
 RUN npm run build
+
+# Build frontend
+WORKDIR /app/src/client
+COPY src/client/package*.json ./
+RUN npm ci
+COPY src/client/ ./
+RUN npm run build
+WORKDIR /app
 
 # Production stage
 FROM node:18-alpine AS production
 
-# Install runtime dependencies for Playwright
+# Install runtime dependencies
 RUN apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
     dumb-init
-
-# Tell Playwright to use installed Chromium
-ENV PLAYWRIGHT_BROWSERS_PATH=/usr/bin
-ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Create app user
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S chronoautotee -u 1001 -G nodejs
+    adduser -S contendo -u 1001 -G nodejs
 
 # Set working directory
 WORKDIR /app
 
 # Install production dependencies only
-COPY --from=builder --chown=chronoautotee:nodejs /app/package*.json ./
+COPY --from=builder --chown=contendo:nodejs /app/package*.json ./
 RUN npm ci --only=production && npm cache clean --force
 
 # Copy built application
-COPY --from=builder --chown=chronoautotee:nodejs /app/dist ./dist
-COPY --from=builder --chown=chronoautotee:nodejs /app/public ./public
+COPY --from=builder --chown=contendo:nodejs /app/dist ./dist
+COPY --from=builder --chown=contendo:nodejs /app/src/client/dist ./public/client/dist
 
 # Create logs directory
-RUN mkdir -p logs && chown chronoautotee:nodejs logs
+RUN mkdir -p logs && chown contendo:nodejs logs
 
 # Switch to app user
-USER chronoautotee
+USER contendo
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
