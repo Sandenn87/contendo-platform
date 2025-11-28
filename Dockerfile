@@ -73,8 +73,7 @@ COPY --from=builder --chown=contendo:nodejs /app/dist ./dist
 RUN mkdir -p ./public/client
 
 # Copy frontend build - copy the entire public directory if it exists
-# Note: COPY will fail if source doesn't exist, so we'll handle that
-COPY --from=builder --chown=contendo:nodejs /app/public ./public 2>&1 || echo "Warning: public directory may not exist in builder stage"
+COPY --from=builder --chown=contendo:nodejs /app/public ./public
 
 # Verify frontend files were copied
 RUN echo "=== Verifying frontend files in production stage ===" && \
