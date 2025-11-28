@@ -69,8 +69,8 @@ RUN mkdir -p ./public/client
 # This ensures we get the dist subdirectory
 COPY --from=builder --chown=contendo:nodejs /app/public ./public
 
-# Create logs directory
-RUN mkdir -p logs && chown contendo:nodejs logs
+# Create logs and uploads directories
+RUN mkdir -p logs uploads && chown -R contendo:nodejs logs uploads
 
 # Switch to app user
 USER contendo
