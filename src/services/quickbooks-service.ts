@@ -127,7 +127,13 @@ export class QuickBooksService {
       const amount = amountMatch ? parseFloat(amountMatch[1]) : null;
 
       // Upload to Supabase Storage
-      const fileBuffer = fs.readFileSync(file.path);
+      let fileBuffer: Buffer;
+      try {
+        fileBuffer = fs.readFileSync(file.path);
+      } catch (error) {
+        throw new Error(`Failed to read receipt file: ${error instanceof Error ? error.message : String(error)}`);
+      }
+      
       const fileName = `${userId}/${Date.now()}_${file.originalname}`;
       
       const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
@@ -156,8 +162,14 @@ export class QuickBooksService {
         .select()
         .single();
 
-      // Clean up temp file
-      fs.unlinkSync(file.path);
+      // Clean up temp file (ignore errors)
+      try {
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+      } catch (cleanupError) {
+        console.warn('Failed to cleanup temp file:', cleanupError);
+      }
 
       if (error) {
         throw error;

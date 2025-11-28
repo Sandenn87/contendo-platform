@@ -19,11 +19,27 @@ class Logger {
   private correlationId: string | null = null;
 
   constructor() {
-    const config = getConfig();
+    let config;
+    try {
+      config = getConfig();
+    } catch (error) {
+      // If config fails to load, use defaults and log to console only
+      console.warn('Config loading failed, using default logger settings:', error);
+      config = {
+        logging: {
+          level: 'info',
+          filePath: './logs'
+        }
+      };
+    }
     
-    // Ensure log directory exists
-    if (!fs.existsSync(config.logging.filePath)) {
-      fs.mkdirSync(config.logging.filePath, { recursive: true });
+    // Ensure log directory exists (with error handling)
+    try {
+      if (!fs.existsSync(config.logging.filePath)) {
+        fs.mkdirSync(config.logging.filePath, { recursive: true });
+      }
+    } catch (error) {
+      console.warn(`Failed to create log directory ${config.logging.filePath}, logging to console only:`, error);
     }
 
     // Define log format

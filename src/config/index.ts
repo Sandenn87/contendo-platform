@@ -26,15 +26,19 @@ function loadConfig(): AppConfig {
   const sessionSecret = process.env.SESSION_SECRET;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase configuration. Please set SUPABASE_URL and SUPABASE_ANON_KEY in your .env file');
+    const errorMsg = 'Missing Supabase configuration. Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables';
+    console.error(`❌ ${errorMsg}`);
+    throw new Error(errorMsg);
   }
 
   if (!supabaseServiceKey) {
-    console.warn('Warning: SUPABASE_SERVICE_KEY not set. Some features may not work.');
+    console.warn('⚠️  Warning: SUPABASE_SERVICE_KEY not set. Some features may not work.');
   }
 
   if (!sessionSecret) {
-    throw new Error('Missing SESSION_SECRET. Please set SESSION_SECRET in your .env file');
+    const errorMsg = 'Missing SESSION_SECRET. Please set SESSION_SECRET environment variable';
+    console.error(`❌ ${errorMsg}`);
+    throw new Error(errorMsg);
   }
 
   return {

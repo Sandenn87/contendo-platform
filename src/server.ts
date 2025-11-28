@@ -253,18 +253,26 @@ export class ContendoServer {
 
   async start(): Promise<void> {
     try {
-      this.httpServer.listen(this.port, () => {
+      // Bind to 0.0.0.0 to accept connections from any interface (required for Railway/Docker)
+      const host = '0.0.0.0';
+      console.log(`Starting server on ${host}:${this.port}...`);
+      
+      this.httpServer.listen(this.port, host, () => {
+        console.log(`✅ Server listening on ${host}:${this.port}`);
         logger.info('Contendo Business Management Platform server started', {
+          host,
           port: this.port,
           nodeEnv: process.env.NODE_ENV || 'development'
         });
       });
 
       this.httpServer.on('error', (error: Error) => {
+        console.error('❌ Server error:', error);
         logger.error('Server error', error);
       });
 
     } catch (error) {
+      console.error('❌ Failed to start server:', error);
       logger.error('Failed to start server', error);
       throw error;
     }
