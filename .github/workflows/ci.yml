@@ -1,0 +1,54 @@
+name: CI - Build and Test
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install backend dependencies
+        run: npm ci
+
+      - name: Install frontend dependencies
+        run: |
+          cd src/client
+          npm ci
+
+      - name: TypeScript check (backend)
+        run: npx tsc --noEmit
+
+      - name: TypeScript check (frontend)
+        run: |
+          cd src/client
+          npx tsc --noEmit
+
+      - name: Build backend
+        run: npm run build
+
+      - name: Build frontend
+        run: |
+          cd src/client
+          npm run build
+
+      - name: Verify build outputs
+        run: |
+          test -d dist && echo "✅ Backend build exists"
+          test -d public/client/dist && echo "✅ Frontend build exists"
+          test -f public/client/dist/index.html && echo "✅ Frontend index.html exists"
+
