@@ -31,11 +31,15 @@ WORKDIR /app/src/client
 RUN npm run build
 
 # Verify frontend build output exists and show location
-RUN echo "Checking for frontend build output..." && \
-    (test -d /app/public/client/dist && echo "Found at /app/public/client/dist" && ls -la /app/public/client/dist/ | head -10) || \
-    (echo "Not found at /app/public/client/dist, checking alternatives..." && \
-     find /app -name "index.html" -type f 2>/dev/null | head -5 || \
-     echo "No index.html found")
+RUN echo "=== Checking for frontend build output ===" && \
+    echo "Current directory: $(pwd)" && \
+    echo "Contents of /app:" && ls -la /app/ | head -20 && \
+    echo "Contents of /app/public:" && (ls -la /app/public/ 2>/dev/null || echo "public directory does not exist") && \
+    echo "Contents of /app/src/client:" && ls -la /app/src/client/ | head -20 && \
+    (test -d /app/public/client/dist && echo "✅ Found at /app/public/client/dist" && ls -la /app/public/client/dist/ | head -10) || \
+    (echo "❌ Not found at /app/public/client/dist, checking alternatives..." && \
+     find /app -name "index.html" -type f 2>/dev/null | head -10 || \
+     echo "No index.html found anywhere")
 
 # Build TypeScript backend (excludes client directory)
 WORKDIR /app
@@ -67,7 +71,13 @@ RUN mkdir -p ./public/client
 
 # Copy frontend build - copy the entire public directory if it exists
 # This ensures we get the dist subdirectory
-COPY --from=builder --chown=contendo:nodejs /app/public ./public
+COPY --from=builder --chown=contendo:nodejs /app/public ./public || echo "Warning: public directory not found in builder stage"
+
+# Verify frontend files were copied
+RUN echo "=== Verifying frontend files in production stage ===" && \
+    ls -la ./public/ 2>/dev/null || echo "public directory does not exist" && \
+    ls -la ./public/client/ 2>/dev/null || echo "public/client directory does not exist" && \
+    ls -la ./public/client/dist/ 2>/dev/null || echo "public/client/dist directory does not exist"
 
 # Create logs and uploads directories
 RUN mkdir -p logs uploads && chown -R contendo:nodejs logs uploads
