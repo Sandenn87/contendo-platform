@@ -154,7 +154,21 @@ export class ContendoServer {
 
     // Serve static files from React build (in production)
     if (process.env.NODE_ENV === 'production') {
-      this.app.use(express.static(path.join(__dirname, '../public/client/dist')));
+      const staticPath = path.join(__dirname, '../public/client/dist');
+      console.log('Serving static files from:', staticPath);
+      
+      // Check if directory exists
+      const fs = require('fs');
+      if (!fs.existsSync(staticPath)) {
+        console.warn(`⚠️  Static directory not found: ${staticPath}`);
+        console.log('Available directories:', fs.readdirSync(path.join(__dirname, '../')).join(', '));
+      } else {
+        console.log('✅ Static directory found');
+        const files = fs.readdirSync(staticPath);
+        console.log('Static files:', files.slice(0, 10).join(', '), files.length > 10 ? '...' : '');
+      }
+      
+      this.app.use(express.static(staticPath));
     }
   }
 
@@ -197,7 +211,30 @@ export class ContendoServer {
     // In production, serve React app for all non-API routes
     if (process.env.NODE_ENV === 'production') {
       this.app.get('*', (req: Request, res: Response) => {
-        res.sendFile(path.join(__dirname, '../public/client/dist/index.html'));
+        // Skip API routes
+        if (req.path.startsWith('/api')) {
+          return next();
+        }
+        
+        const indexPath = path.join(__dirname, '../public/client/dist/index.html');
+        console.log('Serving index.html from:', indexPath);
+        
+        const fs = require('fs');
+        if (!fs.existsSync(indexPath)) {
+          console.error('❌ index.html not found at:', indexPath);
+          return res.status(404).json({
+            error: 'Frontend not found',
+            path: indexPath,
+            message: 'The React app build files are missing. Please check the build process.'
+          });
+        }
+        
+        res.sendFile(indexPath, (err) => {
+          if (err) {
+            console.error('❌ Error sending index.html:', err);
+            res.status(500).json({ error: 'Failed to serve frontend', message: err.message });
+          }
+        });
       });
     } else {
       // In development, redirect to React dev server
@@ -213,17 +250,37 @@ export class ContendoServer {
   private setupErrorHandling(): void {
     // Global error handler
     this.app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+      const correlationId = (req as any).correlationId;
+      const errorDetails = {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        method: req.method,
+        url: req.url,
+        correlationId
+      };
+
+      console.error('❌ Unhandled request error:', errorDetails);
       logger.error('Unhandled request error', error, {
         method: req.method,
         url: req.url,
-        correlationId: (req as any).correlationId
+        correlationId
       });
 
+      // In development or if NODE_ENV is not production, show error details
+      const isDevelopment = process.env.NODE_ENV !== 'production';
+      
       res.status(500).json({
         status: 'error',
-        message: 'Internal server error',
+        message: isDevelopment ? error.message : 'Internal server error',
+        ...(isDevelopment && { 
+          error: error.name,
+          stack: error.stack,
+          path: req.url,
+          method: req.method
+        }),
         timestamp: new Date().toISOString(),
-        correlationId: (req as any).correlationId
+        correlationId
       });
     });
 
