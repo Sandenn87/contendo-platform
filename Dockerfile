@@ -24,12 +24,8 @@ COPY . .
 WORKDIR /app/src/client
 RUN npm run build
 
-# Verify frontend build
-RUN test -d /app/public/client/dist && \
-    test -f /app/public/client/dist/index.html && \
-    echo "✅ Frontend build successful" && \
-    ls -la /app/public/client/dist/ | head -10 || \
-    (echo "❌ Frontend build failed or files missing" && exit 1)
+# Verify frontend build exists
+RUN ls -la /app/public/client/dist/ || (echo "Frontend build failed!" && exit 1)
 
 # Build TypeScript backend
 WORKDIR /app
@@ -55,13 +51,11 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy built backend
 COPY --from=builder --chown=contendo:nodejs /app/dist ./dist
 
-# Copy frontend build
-COPY --from=builder --chown=contendo:nodejs /app/public ./public
+# Copy frontend build - ensure the directory structure is preserved
+COPY --from=builder --chown=contendo:nodejs /app/public/client/dist ./public/client/dist
 
 # Verify frontend files were copied
-RUN test -f ./public/client/dist/index.html && \
-    echo "✅ Frontend files copied successfully" || \
-    (echo "❌ Frontend files missing in production stage" && exit 1)
+RUN test -f ./public/client/dist/index.html || (echo "Frontend files missing!" && exit 1)
 
 # Create required directories with proper permissions
 RUN mkdir -p logs uploads && \
