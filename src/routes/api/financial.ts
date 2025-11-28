@@ -27,7 +27,8 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
     try {
       const { code, realmId } = req.query;
       if (!code || !realmId) {
-        res.status(400).json({ error: 'Authorization code and realm ID required' }); return;
+        res.status(400).json({ error: 'Authorization code and realm ID required' });
+        return;
       }
       const result = await quickbooksService.handleCallback(
         req.user!.id,
