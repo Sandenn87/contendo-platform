@@ -24,7 +24,8 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
     try {
       const deployment = await arbiterService.getDeployment(req.params.id);
       if (!deployment) {
-        res.status(404).json({ error: 'Deployment not found' }); return;
+        res.status(404).json({ error: 'Deployment not found' });
+        return;
       }
       res.json(deployment);
     } catch (error) {
@@ -49,7 +50,8 @@ export function createArbiterRouter(arbiterService: ArbiterService): Router {
     try {
       const deployment = await arbiterService.updateDeployment(req.params.id, req.body);
       if (!deployment) {
-        res.status(404).json({ error: 'Deployment not found' }); return;
+        res.status(404).json({ error: 'Deployment not found' });
+        return;
       }
       res.json(deployment);
     } catch (error) {

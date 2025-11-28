@@ -24,7 +24,8 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
     try {
       const project = await trainingService.getProject(req.params.id);
       if (!project) {
-        res.status(404).json({ error: 'Project not found' }); return;
+        res.status(404).json({ error: 'Project not found' });
+        return;
       }
       res.json(project);
     } catch (error) {
@@ -49,7 +50,8 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
     try {
       const project = await trainingService.updateProject(req.params.id, req.body);
       if (!project) {
-        res.status(404).json({ error: 'Project not found' }); return;
+        res.status(404).json({ error: 'Project not found' });
+        return;
       }
       res.json(project);
     } catch (error) {
@@ -85,7 +87,8 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
     try {
       const milestone = await trainingService.updateMilestone(req.params.id, req.body);
       if (!milestone) {
-        res.status(404).json({ error: 'Milestone not found' }); return;
+        res.status(404).json({ error: 'Milestone not found' });
+        return;
       }
       res.json(milestone);
     } catch (error) {
@@ -132,7 +135,8 @@ export function createTrainingRouter(trainingService: TrainingService): Router {
     try {
       const employee = await trainingService.updateEmployee(req.params.id, req.body);
       if (!employee) {
-        res.status(404).json({ error: 'Employee not found' }); return;
+        res.status(404).json({ error: 'Employee not found' });
+        return;
       }
       res.json(employee);
     } catch (error) {

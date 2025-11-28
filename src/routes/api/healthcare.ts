@@ -25,7 +25,8 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
     try {
       const client = await healthcareService.getClient(req.params.id);
       if (!client) {
-        res.status(404).json({ error: 'Client not found' }); return;
+        res.status(404).json({ error: 'Client not found' });
+        return;
         return;
       }
       res.json(client);
@@ -51,7 +52,8 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
     try {
       const client = await healthcareService.updateClient(req.params.id, req.body);
       if (!client) {
-        res.status(404).json({ error: 'Client not found' }); return;
+        res.status(404).json({ error: 'Client not found' });
+        return;
         return;
       }
       res.json(client);
@@ -157,7 +159,8 @@ export function createHealthcareRouter(healthcareService: HealthcareService): Ro
         req.user!.id
       );
       if (!estimate) {
-        res.status(404).json({ error: 'Estimate not found' }); return;
+        res.status(404).json({ error: 'Estimate not found' });
+        return;
       }
       res.json(estimate);
     } catch (error) {
