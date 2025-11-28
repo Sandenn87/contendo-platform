@@ -28,14 +28,17 @@ COPY . .
 
 # Build frontend first (needs node_modules)
 WORKDIR /app/src/client
-RUN npm run build
-
-# Verify frontend build output exists and show location
-RUN echo "=== Checking for frontend build output ===" && \
+RUN echo "=== Building frontend ===" && \
     echo "Current directory: $(pwd)" && \
-    echo "Contents of /app:" && ls -la /app/ | head -20 && \
-    echo "Contents of /app/public:" && (ls -la /app/public/ 2>/dev/null || echo "public directory does not exist") && \
-    echo "Contents of /app/src/client:" && ls -la /app/src/client/ | head -20 && \
+    echo "Contents before build:" && ls -la . && \
+    npm run build && \
+    echo "=== Build complete, checking output ===" && \
+    echo "Current directory: $(pwd)" && \
+    echo "Contents after build:" && ls -la . && \
+    echo "Checking parent directory:" && ls -la .. && \
+    echo "Checking /app/public:" && (ls -la /app/public/ 2>/dev/null || echo "public directory does not exist") && \
+    echo "Checking /app/public/client:" && (ls -la /app/public/client/ 2>/dev/null || echo "public/client directory does not exist") && \
+    echo "Checking /app/public/client/dist:" && (ls -la /app/public/client/dist/ 2>/dev/null || echo "public/client/dist directory does not exist") && \
     (test -d /app/public/client/dist && echo "✅ Found at /app/public/client/dist" && ls -la /app/public/client/dist/ | head -10) || \
     (echo "❌ Not found at /app/public/client/dist, checking alternatives..." && \
      find /app -name "index.html" -type f 2>/dev/null | head -10 || \
@@ -70,14 +73,22 @@ COPY --from=builder --chown=contendo:nodejs /app/dist ./dist
 RUN mkdir -p ./public/client
 
 # Copy frontend build - copy the entire public directory if it exists
-# This ensures we get the dist subdirectory
-COPY --from=builder --chown=contendo:nodejs /app/public ./public || echo "Warning: public directory not found in builder stage"
+# First check if it exists in builder stage
+RUN --mount=from=builder,source=/app,target=/check \
+    echo "=== Checking builder stage for public directory ===" && \
+    (test -d /check/public && echo "✅ Found /app/public in builder" && ls -la /check/public/ | head -10) || \
+    (echo "❌ /app/public not found in builder, checking /check:" && ls -la /check/ | head -20)
+
+# Copy frontend build
+COPY --from=builder --chown=contendo:nodejs /app/public ./public
 
 # Verify frontend files were copied
 RUN echo "=== Verifying frontend files in production stage ===" && \
-    ls -la ./public/ 2>/dev/null || echo "public directory does not exist" && \
-    ls -la ./public/client/ 2>/dev/null || echo "public/client directory does not exist" && \
-    ls -la ./public/client/dist/ 2>/dev/null || echo "public/client/dist directory does not exist"
+    echo "Contents of ./public:" && (ls -la ./public/ 2>/dev/null || echo "public directory does not exist") && \
+    echo "Contents of ./public/client:" && (ls -la ./public/client/ 2>/dev/null || echo "public/client directory does not exist") && \
+    echo "Contents of ./public/client/dist:" && (ls -la ./public/client/dist/ 2>/dev/null || echo "public/client/dist directory does not exist") && \
+    (test -f ./public/client/dist/index.html && echo "✅ index.html found!") || \
+    (echo "❌ index.html NOT found!" && find ./public -name "*.html" 2>/dev/null || echo "No HTML files found")
 
 # Create logs and uploads directories
 RUN mkdir -p logs uploads && chown -R contendo:nodejs logs uploads
