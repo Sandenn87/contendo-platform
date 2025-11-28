@@ -208,6 +208,40 @@ export class ContendoServer {
       });
     });
 
+    // Debug endpoint to check static files
+    this.app.get('/debug/files', (req: Request, res: Response) => {
+      if (process.env.NODE_ENV !== 'production') {
+        return res.json({ message: 'Not available in development mode' });
+      }
+      
+      const fs = require('fs');
+      const staticPath = path.join(__dirname, '../public/client/dist');
+      
+      try {
+        if (!fs.existsSync(staticPath)) {
+          return res.status(404).json({ error: 'Static directory not found', path: staticPath });
+        }
+        
+        const files = fs.readdirSync(staticPath);
+        const fileDetails = files.map((f: string) => {
+          const stat = fs.statSync(path.join(staticPath, f));
+          return {
+            name: f,
+            size: stat.size,
+            isDirectory: stat.isDirectory(),
+            path: path.join(staticPath, f)
+          };
+        });
+        
+        res.json({
+          staticPath,
+          files: fileDetails
+        });
+      } catch (error: any) {
+        res.status(500).json({ error: 'Failed to list files', message: error.message });
+      }
+    });
+
     // In production, serve React app for all non-API routes
     if (process.env.NODE_ENV === 'production') {
       this.app.get('*', (req: Request, res: Response, next: NextFunction) => {
