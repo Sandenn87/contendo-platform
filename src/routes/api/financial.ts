@@ -110,7 +110,6 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
       if (!req.file) {
         res.status(400).json({ error: 'Receipt file required' });
         return;
-        return;
       }
       const receipt = await quickbooksService.processReceipt(req.user!.id, req.file);
       res.status(201).json(receipt);
