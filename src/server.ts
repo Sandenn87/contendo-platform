@@ -210,8 +210,8 @@ export class ContendoServer {
 
     // In production, serve React app for all non-API routes
     if (process.env.NODE_ENV === 'production') {
-      this.app.get('*', (req: Request, res: Response) => {
-        // Skip API routes
+      this.app.get('*', (req: Request, res: Response, next: NextFunction) => {
+        // Skip API routes (they're already handled above)
         if (req.path.startsWith('/api')) {
           return next();
         }
