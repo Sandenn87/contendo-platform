@@ -25,7 +25,8 @@ WORKDIR /app/src/client
 RUN npm run build
 
 # Verify frontend build exists
-RUN ls -la /app/public/client/dist/ || (echo "Frontend build failed!" && exit 1)
+WORKDIR /app
+RUN test -d /app/public/client/dist && test -f /app/public/client/dist/index.html && echo "✅ Frontend build verified" || (echo "❌ Frontend build failed" && ls -la /app/public/ 2>&1 || true && exit 1)
 
 # Build TypeScript backend
 WORKDIR /app
