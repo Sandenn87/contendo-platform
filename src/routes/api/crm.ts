@@ -28,7 +28,8 @@ export function createCrmRouter(
     try {
       const { code } = req.query;
       if (!code) {
-        res.status(400).json({ error: 'Authorization code required' }); return;
+        res.status(400).json({ error: 'Authorization code required' });
+        return;
       }
       const result = await hubspotService.handleCallback(req.user!.id, code as string);
       res.json(result);
@@ -99,7 +100,8 @@ export function createCrmRouter(
     try {
       const { code } = req.query;
       if (!code) {
-        res.status(400).json({ error: 'Authorization code required' }); return;
+        res.status(400).json({ error: 'Authorization code required' });
+        return;
       }
       const result = await outlookService.handleCallback(req.user!.id, code as string);
       res.json(result);

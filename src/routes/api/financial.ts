@@ -108,7 +108,8 @@ export function createFinancialRouter(quickbooksService: QuickBooksService): Rou
   router.post('/receipts', upload.single('receipt'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       if (!req.file) {
-        res.status(400).json({ error: 'Receipt file required' }); return;
+        res.status(400).json({ error: 'Receipt file required' });
+        return;
         return;
       }
       const receipt = await quickbooksService.processReceipt(req.user!.id, req.file);

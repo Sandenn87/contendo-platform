@@ -48,7 +48,8 @@ export function createAIRouter(aiService: AIService): Router {
     try {
       const { question, context } = req.body;
       if (!question) {
-        res.status(400).json({ error: 'Question is required' }); return;
+        res.status(400).json({ error: 'Question is required' });
+        return;
       }
       const response = await aiService.askQuestion(req.user!.id, question, context);
       res.json(response);
