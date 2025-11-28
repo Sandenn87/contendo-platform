@@ -33,7 +33,7 @@ export function createAIRouter(aiService: AIService): Router {
         status
       );
       if (!recommendation) {
-        res.status(404).json({ error: 'Recommendation not found' }); return;
+        res.status(404).json({ error: 'Recommendation not found' });
         return;
       }
       res.json(recommendation);
